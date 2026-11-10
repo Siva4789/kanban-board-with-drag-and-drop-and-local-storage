@@ -1,23 +1,39 @@
 /**
- * Yara Kanban - Main Script
- * Handles task management, local storage, UI rendering, and HTML5 Drag & Drop.
+ * Yara Kanban Board - Core Script
+ * Handles LocalStorage state, drag-and-drop mechanics, and dynamic task CRUD operations.
  */
 
-// State Management
+const STORAGE_KEY = 'yara_kanban_tasks_v1';
+
+// Default initial tasks if none present in localStorage
+const defaultTasks = [
+    {
+        id: 'task-1',
+        title: 'Design System Architecture',
+        description: 'Define tailwind tokens, typography scale, and color palettes.',
+        status: 'done',
+        priority: 'high'
+    },
+    {
+        id: 'task-2',
+        title: 'Implement Drag and Drop',
+        description: 'Attach HTML5 drag & drop listeners to cards and columns.',
+        status: 'inprogress',
+        priority: 'high'
+    },
+    {
+        id: 'task-3',
+        title: 'Task Management Features',
+        description: 'Enable full create, edit, and delete capability with localStorage sync.',
+        status: 'todo',
+        priority: 'medium'
+    }
+];
+
 let tasks = [];
+let draggedCardId = null;
 
-// DOM Elements
-const taskModal = document.getElementById('task-modal');
-const taskForm = document.getElementById('task-form');
-const modalTitle = document.getElementById('modal-title');
-const taskIdInput = document.getElementById('task-id');
-const taskTitleInput = document.getElementById('task-title');
-const taskDescInput = document.getElementById('task-desc');
-const taskColumnSelect = document.getElementById('task-column');
-const taskPrioritySelect = document.getElementById('task-priority');
-const addTaskBtn = document.getElementById('add-task-btn');
-
-// Initialize App on DOM Content Loaded
+// Initialize application state on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
     loadTasks();
     renderBoard();
@@ -26,114 +42,63 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Load tasks from Local Storage or initialize defaults if none exist
+ * LocalStorage persistence functions
  */
 function loadTasks() {
-    const storedTasks = localStorage.getItem('yara_kanban_tasks');
-    if (storedTasks) {
-        try {
-            tasks = JSON.parse(storedTasks);
-        } catch (e) {
-            console.error('Failed to parse tasks from localStorage', e);
-            tasks = getInitialTasks();
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            tasks = JSON.parse(stored);
+        } else {
+            tasks = defaultTasks;
+            saveTasks();
         }
-    } else {
-        tasks = getInitialTasks();
-        saveTasks();
+    } catch (e) {
+        console.error('Failed to load tasks from localStorage:', e);
+        tasks = defaultTasks;
     }
 }
 
-/**
- * Save current tasks array to Local Storage
- */
 function saveTasks() {
-    localStorage.setItem('yara_kanban_tasks', JSON.stringify(tasks));
-}
-
-/**
- * Default initial tasks for first-time visitors
- */
-function getInitialTasks() {
-    return [
-        {
-            id: 'task-1',
-            title: 'Design system architecture',
-            description: 'Establish standard color palettes, typography scales, and modular component guidelines.',
-            column: 'todo',
-            priority: 'high'
-        },
-        {
-            id: 'task-2',
-            title: 'Implement authentication flow',
-            description: 'Secure JWT based authentication with secure httpOnly refresh tokens.',
-            column: 'in-progress',
-            priority: 'high'
-        },
-        {
-            id: 'task-3',
-            title: 'Write unit tests for core utilities',
-            description: 'Ensure 90%+ code coverage for parser and storage modules.',
-            column: 'review',
-            priority: 'medium'
-        },
-        {
-            id: 'task-4',
-            title: 'Setup repository and CI/CD pipeline',
-            description: 'Configured automated linting, building, and deployment workflows.',
-            column: 'done',
-            priority: 'low'
-        }
-    ];
-}
-
-/**
- * Set up general UI event listeners
- */
-function setupEventListeners() {
-    if (addTaskBtn) {
-        addTaskBtn.addEventListener('click', () => openAddTaskModal('todo'));
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    } catch (e) {
+        console.error('Failed to save tasks to localStorage:', e);
     }
 }
 
 /**
- * Render the Kanban board columns and task cards
+ * Render all tasks onto the board and update column counters
  */
 function renderBoard() {
-    const columns = ['todo', 'in-progress', 'review', 'done'];
-    
-    columns.forEach(col => {
-        const container = document.getElementById(`list-${col}`);
-        const countBadge = document.getElementById(`count-${col}`);
+    const todoContainer = document.getElementById('todo-dropzone');
+    const inprogressContainer = document.getElementById('inprogress-dropzone');
+    const doneContainer = document.getElementById('done-dropzone');
+
+    // Clear existing contents
+    todoContainer.innerHTML = '';
+    inprogressContainer.innerHTML = '';
+    doneContainer.innerHTML = '';
+
+    let counts = { todo: 0, inprogress: 0, done: 0 };
+
+    tasks.forEach(task => {
+        counts[task.status] = (counts[task.status] || 0) + 1;
+        const cardElement = createTaskCardElement(task);
         
-        if (!container) return;
-        
-        // Filter tasks for this column
-        const colTasks = tasks.filter(t => t.column === col);
-        
-        // Update counter badge
-        if (countBadge) {
-            countBadge.textContent = colTasks.length;
+        if (task.status === 'todo') {
+            todoContainer.appendChild(cardElement);
+        } else if (task.status === 'inprogress') {
+            inprogressContainer.appendChild(cardElement);
+        } else if (task.status === 'done') {
+            doneContainer.appendChild(cardElement);
         }
-        
-        // Clear container
-        container.innerHTML = '';
-        
-        if (colTasks.length === 0) {
-            container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-8 text-slate-600 border border-dashed border-slate-800/60 rounded-xl">
-                    <i class="fa-regular fa-folder-open text-2xl mb-1"></i>
-                    <span class="text-xs">No tasks yet</span>
-                </div>
-            `;
-            return;
-        }
-        
-        // Render task cards
-        colTasks.forEach(task => {
-            const card = createTaskCardElement(task);
-            container.appendChild(card);
-        });
     });
+
+    // Update column counters
+    document.getElementById('count-todo').textContent = counts.todo;
+    document.getElementById('count-inprogress').textContent = counts.inprogress;
+    document.getElementById('count-done').textContent = counts.done;
 }
 
 /**
@@ -141,191 +106,182 @@ function renderBoard() {
  */
 function createTaskCardElement(task) {
     const card = document.createElement('div');
-    card.className = 'task-card bg-slate-900/90 border border-slate-800/80 rounded-xl p-4 shadow-sm hover:border-slate-700/80 group';
-    card.setAttribute('draggable', 'true');
-    card.setAttribute('data-task-id', task.id);
-    
-    // Priority badge styling
-    let priorityBadgeClass = 'bg-slate-800 text-slate-300';
+    card.className = 'bg-slate-900 border border-slate-800/80 rounded-xl p-4 shadow-sm hover:border-slate-700 transition cursor-grab active:cursor-grabbing group relative';
+    card.draggable = true;
+    card.dataset.id = task.id;
+
+    // Priority Badge styling
+    let priorityClass = 'bg-slate-800 text-slate-300';
     if (task.priority === 'high') {
-        priorityBadgeClass = 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+        priorityClass = 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
     } else if (task.priority === 'medium') {
-        priorityBadgeClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+        priorityClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
     } else if (task.priority === 'low') {
-        priorityBadgeClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        priorityClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
     }
-    
+
     card.innerHTML = `
         <div class="flex items-start justify-between gap-2 mb-2">
-            <h4 class="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors leading-snug">${escapeHtml(task.title)}</h4>
-            <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onclick="editTask('${task.id}')" class="text-slate-400 hover:text-slate-200 p-1 rounded transition-colors" title="Edit Task">
-                    <i class="fa-solid fa-pen text-xs"></i>
+            <h4 class="text-sm font-semibold text-slate-200 group-hover:text-indigo-400 transition">${escapeHTML(task.title)}</h4>
+            <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition">
+                <button onclick="openEditTaskModal('${task.id}')" class="p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition" title="Edit Task">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
                 </button>
-                <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors" title="Delete Task">
-                    <i class="fa-solid fa-trash text-xs"></i>
+                <button onclick="deleteTask('${task.id}')" class="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition" title="Delete Task">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
                 </button>
             </div>
         </div>
-        ${task.description ? `<p class="text-xs text-slate-400 line-clamp-2 mb-3 leading-relaxed">${escapeHtml(task.description)}</p>` : ''}
+        ${task.description ? `<p class="text-xs text-slate-400 line-clamp-2 mb-3">${escapeHTML(task.description)}</p>` : ''}
         <div class="flex items-center justify-between pt-2 border-t border-slate-800/60">
-            <span class="text-[10px] font-medium px-2 py-0.5 rounded-md uppercase tracking-wider ${priorityBadgeClass}">${task.priority}</span>
-            <div class="flex items-center text-slate-500 text-xs space-x-1">
-                <i class="fa-solid fa-grip-vertical text-[10px]"></i>
-            </div>
+            <span class="text-[10px] font-medium px-2 py-0.5 rounded-md uppercase tracking-wider ${priorityClass}">${task.priority}</span>
+            <span class="text-[10px] text-slate-500 font-mono">#${task.id.slice(-4)}</span>
         </div>
     `;
-    
-    // Attach drag events to the card
-    card.addEventListener('dragstart', handleDragStart);
-    card.addEventListener('dragend', handleDragEnd);
-    
+
+    // Attach dragstart and dragend directly to card element
+    card.addEventListener('dragstart', (e) => {
+        draggedCardId = task.id;
+        setTimeout(() => card.classList.add('opacity-40'), 0);
+    });
+
+    card.addEventListener('dragend', () => {
+        card.classList.remove('opacity-40');
+        draggedCardId = null;
+        document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('drag-over'));
+    });
+
     return card;
 }
 
 /**
- * Setup HTML5 Drag and Drop events on columns
+ * Drag and Drop zone event handlers
  */
 function setupDragAndDrop() {
-    const columns = document.querySelectorAll('.kanban-column');
-    
-    columns.forEach(column => {
-        column.addEventListener('dragover', handleDragOver);
-        column.addEventListener('dragenter', handleDragEnter);
-        column.addEventListener('dragleave', handleDragLeave);
-        column.addEventListener('drop', handleDrop);
+    const dropzones = document.querySelectorAll('.dropzone');
+
+    dropzones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        zone.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', (e) => {
+            if (!zone.contains(e.relatedTarget)) {
+                zone.classList.remove('drag-over');
+            }
+        });
+
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+
+            const newStatus = zone.dataset.status;
+            if (draggedCardId && newStatus) {
+                updateTaskStatus(draggedCardId, newStatus);
+            }
+        });
     });
-}
-
-// Drag & Drop Event Handlers
-let draggedTaskId = null;
-
-function handleDragStart(e) {
-    draggedTaskId = this.getAttribute('data-task-id');
-    this.classList.add('dragging');
-    e.dataTransfer.setData('text/plain', draggedTaskId);
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-function handleDragEnd(e) {
-    this.classList.remove('dragging');
-    draggedTaskId = null;
-    
-    // Remove drag-over states from all columns
-    document.querySelectorAll('.kanban-column').forEach(col => {
-        col.classList.remove('drag-over');
-    });
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-}
-
-function handleDragEnter(e) {
-    e.preventDefault();
-    const column = this.closest('.kanban-column');
-    if (column) {
-        column.classList.add('drag-over');
-    }
-}
-
-function handleDragLeave(e) {
-    const column = this.closest('.kanban-column');
-    // Ensure we are leaving the column container and not entering a child element
-    if (column && !column.contains(e.relatedTarget)) {
-        column.classList.remove('drag-over');
-    }
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    const column = this.closest('.kanban-column');
-    if (!column) return;
-    
-    column.classList.remove('drag-over');
-    const targetColumnId = column.getAttribute('data-column');
-    
-    const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
-    
-    if (taskId && targetColumnId) {
-        moveTaskColumn(taskId, targetColumnId);
-    }
 }
 
 /**
- * Move a task to a new column and re-render
+ * Update task status on drop or move
  */
-function moveTaskColumn(taskId, newColumn) {
+function updateTaskStatus(taskId, newStatus) {
     const task = tasks.find(t => t.id === taskId);
-    if (task && task.column !== newColumn) {
-        task.column = newColumn;
+    if (task && task.status !== newStatus) {
+        task.status = newStatus;
         saveTasks();
         renderBoard();
     }
 }
 
 /**
- * Open Modal for creating a new task
+ * Modal UI & Event Listeners
  */
-function openAddTaskModal(defaultColumn = 'todo') {
-    modalTitle.textContent = 'Create New Task';
-    taskIdInput.value = '';
-    taskTitleInput.value = '';
-    taskDescInput.value = '';
-    taskColumnSelect.value = defaultColumn;
-    taskPrioritySelect.value = 'medium';
-    
-    taskModal.classList.remove('hidden');
-    taskTitleInput.focus();
+function setupEventListeners() {
+    const modal = document.getElementById('task-modal');
+    const openModalBtn = document.getElementById('open-add-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+    const taskForm = document.getElementById('task-form');
+
+    openModalBtn.addEventListener('click', () => openNewTaskModalWithStatus('todo'));
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleTaskFormSubmit();
+    });
 }
 
-/**
- * Open Modal for editing an existing task
- */
-function editTask(taskId) {
+function openNewTaskModalWithStatus(status) {
+    const modal = document.getElementById('task-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const taskForm = document.getElementById('task-form');
+
+    modalTitle.textContent = 'Create New Task';
+    taskForm.reset();
+    document.getElementById('task-id').value = '';
+    document.getElementById('task-status').value = status;
+    document.getElementById('task-priority').value = 'medium';
+
+    modal.classList.remove('hidden');
+    document.getElementById('task-title').focus();
+}
+
+function openEditTaskModal(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
-    
+
+    const modal = document.getElementById('task-modal');
+    const modalTitle = document.getElementById('modal-title');
+
     modalTitle.textContent = 'Edit Task';
-    taskIdInput.value = task.id;
-    taskTitleInput.value = task.title;
-    taskDescInput.value = task.description || '';
-    taskColumnSelect.value = task.column;
-    taskPrioritySelect.value = task.priority;
-    
-    taskModal.classList.remove('hidden');
-    taskTitleInput.focus();
+    document.getElementById('task-id').value = task.id;
+    document.getElementById('task-title').value = task.title;
+    document.getElementById('task-description').value = task.description || '';
+    document.getElementById('task-status').value = task.status;
+    document.getElementById('task-priority').value = task.priority;
+
+    modal.classList.remove('hidden');
+    document.getElementById('task-title').focus();
 }
 
-/**
- * Close task modal
- */
 function closeModal() {
-    taskModal.classList.add('hidden');
+    const modal = document.getElementById('task-modal');
+    modal.classList.add('hidden');
 }
 
-/**
- * Handle form submission for create / edit task
- */
-function handleTaskFormSubmit(e) {
-    e.preventDefault();
-    
-    const id = taskIdInput.value;
-    const title = taskTitleInput.value.trim();
-    const description = taskDescInput.value.trim();
-    const column = taskColumnSelect.value;
-    const priority = taskPrioritySelect.value;
-    
+function handleTaskFormSubmit() {
+    const id = document.getElementById('task-id').value;
+    const title = document.getElementById('task-title').value.trim();
+    const description = document.getElementById('task-description').value.trim();
+    const status = document.getElementById('task-status').value;
+    const priority = document.getElementById('task-priority').value;
+
     if (!title) return;
-    
+
     if (id) {
         // Edit existing task
         const task = tasks.find(t => t.id === id);
         if (task) {
             task.title = title;
             task.description = description;
-            task.column = column;
+            task.status = status;
             task.priority = priority;
         }
     } else {
@@ -334,20 +290,17 @@ function handleTaskFormSubmit(e) {
             id: 'task-' + Date.now(),
             title,
             description,
-            column,
+            status,
             priority
         };
         tasks.push(newTask);
     }
-    
+
     saveTasks();
     renderBoard();
     closeModal();
 }
 
-/**
- * Delete a task
- */
 function deleteTask(taskId) {
     if (confirm('Are you sure you want to delete this task?')) {
         tasks = tasks.filter(t => t.id !== taskId);
@@ -357,14 +310,14 @@ function deleteTask(taskId) {
 }
 
 /**
- * Utility to escape HTML and prevent XSS
+ * Utility helper to escape HTML and prevent XSS
  */
-function escapeHtml(str) {
+function escapeHTML(str) {
     if (!str) return '';
     return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }

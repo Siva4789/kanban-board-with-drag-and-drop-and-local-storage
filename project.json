@@ -36,7 +36,7 @@
       "id": 4,
       "title": "Drag and Drop Functionality",
       "description": "Implement HTML5 Drag and Drop API events (dragstart, dragover, drop) to move tasks seamlessly between columns.",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": 5,
