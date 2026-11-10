@@ -1,167 +1,310 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YARA - Autonomous Workflow Manager</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            slate: {
-              850: '#151f32',
-              950: '#090d16',
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yara Kanban Board</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-  <!-- FontAwesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
+    </script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+<body class="h-full bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
 
-  <!-- Header / Navigation -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-          <i class="fa-solid fa-robot text-white text-lg"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">YARA Workflow</h1>
-          <p class="text-xs text-slate-400">Autonomous Project Manager</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-3">
-        <button class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition border border-slate-700/60 flex items-center space-x-2">
-          <i class="fa-solid fa-terminal text-blue-400"></i>
-          <span>CLI Logs</span>
-        </button>
-        <button class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-medium text-white transition shadow-lg shadow-blue-600/20 flex items-center space-x-2">
-          <i class="fa-solid fa-plus"></i>
-          <span>New Task</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content Area -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
-    
-    <!-- Project Status Bar -->
-    <div class="glass-panel rounded-2xl p-4 sm:p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <div class="flex items-center space-x-2">
-          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse-subtle"></span>
-          <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">System Active</span>
-        </div>
-        <h2 class="text-xl font-bold text-white mt-1">yara-mwal4t2e</h2>
-        <p class="text-sm text-slate-400 mt-0.5">Autonomous developer agent active and ready for instructions.</p>
-      </div>
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2 text-center flex-1 sm:flex-none">
-          <div class="text-xs text-slate-400">Completed</div>
-          <div class="text-lg font-bold text-white">0 / 4</div>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2 text-center flex-1 sm:flex-none">
-          <div class="text-xs text-slate-400">Velocity</div>
-          <div class="text-lg font-bold text-blue-400">100%</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Kanban Board Columns -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
-      
-      <!-- Column 1: Todo -->
-      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl flex flex-col max-h-[calc(100vh-16rem)]">
-        <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <div class="w-3 h-3 rounded-full bg-amber-500"></div>
-            <h3 class="font-semibold text-white text-sm">To Do</h3>
-            <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-medium">2</span>
-          </div>
-          <button class="text-slate-400 hover:text-white transition">
-            <i class="fa-solid fa-ellipsis"></i>
-          </button>
-        </div>
-        <div class="p-3 flex-1 overflow-y-auto space-y-3 drop-zone" data-status="todo">
-          <!-- Sample Card 1 -->
-          <div class="kanban-card bg-slate-850 border border-slate-700/60 rounded-xl p-4 shadow-sm hover:border-slate-600">
-            <div class="flex items-center justify-between mb-2">
-              <span class="badge-feature text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">Feature</span>
-              <span class="text-xs text-slate-400 font-mono">#1</span>
+    <!-- Header / Navigation -->
+    <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
             </div>
-            <h4 class="font-medium text-white text-sm mb-1">Project Initialization</h4>
-            <p class="text-xs text-slate-400 line-clamp-2">Initialize project with index.html using TailwindCSS.</p>
-          </div>
-
-          <!-- Sample Card 2 -->
-          <div class="kanban-card bg-slate-850 border border-slate-700/60 rounded-xl p-4 shadow-sm hover:border-slate-600">
-            <div class="flex items-center justify-between mb-2">
-              <span class="badge-refactor text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">Design</span>
-              <span class="text-xs text-slate-400 font-mono">#2</span>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Yara Board</h1>
+                <p class="text-xs text-slate-400">Workspace / Sprint 1</p>
             </div>
-            <h4 class="font-medium text-white text-sm mb-1">Styling and Layout Design</h4>
-            <p class="text-xs text-slate-400 line-clamp-2">Add custom styles in styles.css for drop zones and states.</p>
-          </div>
         </div>
-      </div>
 
-      <!-- Column 2: In Progress -->
-      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl flex flex-col max-h-[calc(100vh-16rem)]">
-        <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-            <h3 class="font-semibold text-white text-sm">In Progress</h3>
-            <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-medium">0</span>
-          </div>
-          <button class="text-slate-400 hover:text-white transition">
-            <i class="fa-solid fa-ellipsis"></i>
-          </button>
+        <div class="flex items-center space-x-3">
+            <button class="px-3.5-px py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700/60 transition shadow-sm flex items-center space-x-2">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span>Search</span>
+            </button>
+            <button class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>New Task</span>
+            </button>
         </div>
-        <div class="p-3 flex-1 overflow-y-auto space-y-3 drop-zone" data-status="in-progress">
-          <!-- Empty state placeholder or cards -->
-          <div class="h-full flex items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl p-6 text-center">
-            <p class="text-xs text-slate-500">Drag tasks here or start execution</p>
-          </div>
+    </header>
+
+    <!-- Main Board Area -->
+    <main class="flex-1 overflow-x-auto p-6 flex space-x-6 items-start custom-scrollbar">
+        
+        <!-- Column: To Do -->
+        <div class="w-80 shrink-0 bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-800/80 flex flex-col max-h-full shadow-xl">
+            <!-- Column Header -->
+            <div class="p-4 flex items-center justify-between border-b border-slate-800/60">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></span>
+                    <h2 class="font-semibold text-slate-200 text-sm">To Do</h2>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-medium">2</span>
+                </div>
+                <button class="text-slate-400 hover:text-slate-200 p-1 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Task Cards Drop Zone -->
+            <div class="p-3 flex-1 overflow-y-auto space-y-3 custom-scrollbar drop-zone" data-column="todo">
+                
+                <!-- Task Card 1 -->
+                <div class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-xl p-4 shadow-md transition cursor-grab active:cursor-grabbing group">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="px-2.5 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold rounded-md">High</span>
+                        <button class="text-slate-500 group-hover:text-slate-300 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <h3 class="font-medium text-slate-100 text-sm mb-1">Design system review</h3>
+                    <p class="text-slate-400 text-xs line-clamp-2 mb-3">Review the latest UI components and design tokens.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/40 text-xs text-slate-400">
+                        <div class="flex space-x-1">
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">Design</span>
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">UI</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Card 2 -->
+                <div class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-xl p-4 shadow-md transition cursor-grab active:cursor-grabbing group">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="px-2.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold rounded-md">Medium</span>
+                        <button class="text-slate-500 group-hover:text-slate-300 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <h3 class="font-medium text-slate-100 text-sm mb-1">Setup repository</h3>
+                    <p class="text-slate-400 text-xs line-clamp-2 mb-3">Initialize Git repository and setup project structure.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/40 text-xs text-slate-400">
+                        <div class="flex space-x-1">
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">DevOps</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Column Footer Action -->
+            <div class="p-3 border-t border-slate-800/60">
+                <button class="w-full py-2 px-3 bg-slate-800/40 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded-lg border border-dashed border-slate-700 transition flex items-center justify-center space-x-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Add card</span>
+                </button>
+            </div>
         </div>
-      </div>
 
-      <!-- Column 3: Done -->
-      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl flex flex-col max-h-[calc(100vh-16rem)]">
-        <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-            <h3 class="font-semibold text-white text-sm">Done</h3>
-            <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-medium">0</span>
-          </div>
-          <button class="text-slate-400 hover:text-white transition">
-            <i class="fa-solid fa-ellipsis"></i>
-          </button>
+        <!-- Column: In Progress -->
+        <div class="w-80 shrink-0 bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-800/80 flex flex-col max-h-full shadow-xl">
+            <div class="p-4 flex items-center justify-between border-b border-slate-800/60">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50"></span>
+                    <h2 class="font-semibold text-slate-200 text-sm">In Progress</h2>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-medium">1</span>
+                </div>
+                <button class="text-slate-400 hover:text-slate-200 p-1 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-3 flex-1 overflow-y-auto space-y-3 custom-scrollbar drop-zone" data-column="in-progress">
+                <div class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-xl p-4 shadow-md transition cursor-grab active:cursor-grabbing group">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="px-2.5 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold rounded-md">High</span>
+                        <button class="text-slate-500 group-hover:text-slate-300 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <h3 class="font-medium text-slate-100 text-sm mb-1">Local Storage Integration</h3>
+                    <p class="text-slate-400 text-xs line-clamp-2 mb-3">Implement functions to save and load board state.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/40 text-xs text-slate-400">
+                        <div class="flex space-x-1">
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">Feature</span>
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">Storage</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-t border-slate-800/60">
+                <button class="w-full py-2 px-3 bg-slate-800/40 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded-lg border border-dashed border-slate-700 transition flex items-center justify-center space-x-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Add card</span>
+                </button>
+            </div>
         </div>
-        <div class="p-3 flex-1 overflow-y-auto space-y-3 drop-zone" data-status="done">
-          <div class="h-full flex items-center justify-center border-2 border-dashed border-slate-800/60 rounded-xl p-6 text-center">
-            <p class="text-xs text-slate-500">Completed tasks will appear here</p>
-          </div>
+
+        <!-- Column: Review -->
+        <div class="w-80 shrink-0 bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-800/80 flex flex-col max-h-full shadow-xl">
+            <div class="p-4 flex items-center justify-between border-b border-slate-800/60">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-purple-500 shadow-sm shadow-purple-500/50"></span>
+                    <h2 class="font-semibold text-slate-200 text-sm">Review</h2>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-medium">1</span>
+                </div>
+                <button class="text-slate-400 hover:text-slate-200 p-1 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-3 flex-1 overflow-y-auto space-y-3 custom-scrollbar drop-zone" data-column="review">
+                <div class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-xl p-4 shadow-md transition cursor-grab active:cursor-grabbing group">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold rounded-md">Low</span>
+                        <button class="text-slate-500 group-hover:text-slate-300 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <h3 class="font-medium text-slate-100 text-sm mb-1">Security audit</h3>
+                    <p class="text-slate-400 text-xs line-clamp-2 mb-3">Check dependencies for known vulnerabilities.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/40 text-xs text-slate-400">
+                        <div class="flex space-x-1">
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">Security</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-t border-slate-800/60">
+                <button class="w-full py-2 px-3 bg-slate-800/40 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded-lg border border-dashed border-slate-700 transition flex items-center justify-center space-x-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Add card</span>
+                </button>
+            </div>
         </div>
-      </div>
 
-    </div>
-  </main>
+        <!-- Column: Done -->
+        <div class="w-80 shrink-0 bg-slate-900/60 backdrop-blur rounded-2xl border border-slate-800/80 flex flex-col max-h-full shadow-xl">
+            <div class="p-4 flex items-center justify-between border-b border-slate-800/60">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
+                    <h2 class="font-semibold text-slate-200 text-sm">Done</h2>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-medium">1</span>
+                </div>
+                <button class="text-slate-400 hover:text-slate-200 p-1 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-3 flex-1 overflow-y-auto space-y-3 custom-scrollbar drop-zone" data-column="done">
+                <div class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-xl p-4 shadow-md transition cursor-grab active:cursor-grabbing group">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="px-2.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold rounded-md">Medium</span>
+                        <button class="text-slate-500 group-hover:text-slate-300 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <h3 class="font-medium text-slate-100 text-sm mb-1">Project Initialization</h3>
+                    <p class="text-slate-400 text-xs line-clamp-2 mb-3">Setup initial HTML and CSS layout.</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/40 text-xs text-slate-400">
+                        <div class="flex space-x-1">
+                            <span class="px-1.5 py-0.5 bg-slate-700/60 rounded text-[10px] text-slate-300">Setup</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-t border-slate-800/60">
+                <button class="w-full py-2 px-3 bg-slate-800/40 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded-lg border border-dashed border-slate-700 transition flex items-center justify-center space-x-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Add card</span>
+                </button>
+            </div>
+        </div>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs text-slate-500">
-    YARA Autonomous Agent Environment &bull; Powered by Gemini
-  </footer>
+        <!-- Add Column Button -->
+        <div class="w-80 shrink-0">
+            <button class="w-full py-3.5 px-4 bg-slate-900/40 hover:bg-slate-900/80 text-slate-400 hover:text-slate-200 text-sm font-medium rounded-2xl border border-dashed border-slate-700 transition flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Add another list</span>
+            </button>
+        </div>
 
+    </main>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
