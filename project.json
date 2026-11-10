@@ -18,7 +18,7 @@
       "id": 1,
       "title": "Project Setup and HTML Structure",
       "description": "Create the main index.html file with TailwindCSS CDN integration and layout structure for columns and cards.",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": 2,
