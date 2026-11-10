@@ -42,7 +42,7 @@
       "id": 5,
       "title": "Task Management Features",
       "description": "Add functionality to create, edit, and delete tasks dynamically, updating both the UI and local storage.",
-      "status": "pending"
+      "status": "completed"
     }
   ]
 }
