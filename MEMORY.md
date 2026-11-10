@@ -7,3 +7,6 @@ Added styles.css providing custom CSS variables, drop zone styling with drag-and
 
 ### [2026-11-10T11:07:27.051Z]
 Added script.js with Local Storage persistence functions and integrated script into index.html.
+
+### [2026-11-10T11:07:44.232Z]
+Added HTML5 drag and drop event handlers (dragstart, dragover, dragenter, dragleave, drop, dragend) directly in script.js and updated card markup in index.html to support draggable elements and drop zones.

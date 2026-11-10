@@ -1,74 +1,57 @@
-/* Custom Styles for YARA Project Workflow */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-glow: rgba(59, 130, 246, 0.15);
+    --bg-primary: #0a0f1d;
+    --bg-card: #151f32;
+    --accent-indigo: #6366f1;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+    width: 6px;
+    height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+    background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.8);
-  border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(71, 85, 105, 1);
+    background: rgba(255, 255, 255, 0.2);
 }
 
-/* Drop Zone & Drag States */
-.drop-zone {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 120px;
+/* Drag and drop states */
+.kanban-column.drag-over {
+    background-color: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
 }
 
-.drop-zone.drag-over {
-  background-color: rgba(59, 130, 246, 0.08) !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 20px var(--primary-glow);
-  transform: scale(1.01);
+.task-card {
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-/* Card Dragging States */
-.kanban-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-  cursor: grab;
+.task-card:active {
+    cursor: grabbing;
 }
 
-.kanban-card:active {
-  cursor: grabbing;
+.task-card.dragging {
+    opacity: 0.4;
+    transform: scale(0.97);
+    border: 2px dashed rgba(99, 102, 241, 0.6);
 }
 
-.kanban-card.dragging {
-  opacity: 0.4;
-  transform: scale(0.95);
-  border: 2px dashed #3b82f6;
+/* Smooth transitions */
+.kanban-column {
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-/* Glassmorphism & Polish */
-.glass-panel {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Pulse animations for active indicators */
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Badge colors */
-.badge-bug { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-.badge-feature { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-.badge-docs { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-.badge-refactor { background-color: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }

@@ -30,7 +30,7 @@
       "id": 3,
       "title": "Local Storage Integration",
       "description": "Implement functions in script.js to save and load board state from the browser's localStorage.",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": 4,
